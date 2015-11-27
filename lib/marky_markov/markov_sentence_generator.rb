@@ -111,7 +111,7 @@ class MarkovSentenceGenerator # :nodoc:
       if that_starts_with.nil?
         sentence.push(random_capitalized_word)
       else
-        sentence.push(start_sentence_with.split(" "))
+        sentence.push(that_starts_with.split(" "))
       end
 
       until (punctuation?(sentence.last[-1])) || wordcount > maximum_length
