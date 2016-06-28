@@ -109,9 +109,9 @@ class MarkovSentenceGenerator # :nodoc:
     sentencecount.times do
       wordcount = 0
       if that_starts_with.nil?
-        sentence.push(random_capitalized_word)
+        sentence.concat(random_capitalized_word)
       else
-        sentence.push(that_starts_with.split(" "))
+        sentence.concat(that_starts_with)
       end
 
       until (punctuation?(sentence.last[-1])) || wordcount > maximum_length
