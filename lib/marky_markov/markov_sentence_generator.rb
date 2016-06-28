@@ -93,6 +93,10 @@ class MarkovSentenceGenerator # :nodoc:
     sentence.join(' ')
   end
 
+  def entries_starting_with(word)
+    @dictionary.dictionary.keys.select { |k| k.first == word }
+  end
+
   # Generates a (sentencecount) sentences using the weighted_random function.
   #
   # @param [Int] sentencecount The number of sentences you want the generated string to contain.
@@ -112,6 +116,14 @@ class MarkovSentenceGenerator # :nodoc:
         sentence.concat(random_capitalized_word)
       else
         sentence.concat(that_starts_with)
+        if weighted_random(sentence.last(@depth)).nil?
+          last_word_is_prefix = entries_starting_with(sentence.last)
+          if last_word_is_prefix.empty?
+            sentence.concat(random_word)
+          else
+            sentence.concat(last_word_is_prefix.sample[1..-1])
+          end
+        end
       end
 
       until (punctuation?(sentence.last[-1])) || wordcount > maximum_length
