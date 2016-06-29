@@ -12,6 +12,7 @@ opt_parser = OptionParser.new do |opts|
   opts.separator "    speak: Generate Markov Chain sentence (5 sentences by default)"
   opts.separator "    listen [sentence]: Generate Markov Chain sentence from supplied string."
   opts.separator "    read [file]: Add words to dictionary from supplied text file"
+  opts.separator "    find [tuple]: Search dictionary for tuple"
   opts.separator ""
   opts.separator "Options"
 
@@ -91,6 +92,24 @@ when "listen"
   markov = MarkyMarkov::TemporaryDictionary.new
   markov.parse_string(STDIN.tty? ? ARGV[1] : STDIN.read)
   STDOUT.puts markov.generate_n_sentences(options[:sentencecount])
+when "find"
+  tuple_s = ARGV[1] || STDIN.read
+  tuple = tuple_s.split(/\s+/)
+  if options[:source]
+    markov = MarkyMarkov::TemporaryDictionary.new
+    begin markov.parse_file(options[:source])
+    rescue MarkovDictionary::FileNotFoundError => err
+      abort("Sorry, #{err}. I can't use it as a source.")
+    end
+  else
+    unless File.exists?("#{options[:dictionary]}.mmd")
+      STDERR.puts "Dictionary file #{options[:dictionary]}.mmd does not exist. Cannot generate sentence."
+      STDERR.puts "Please build a dictionary with read or use the --source option to build a temporary dictionary."
+      exit(false)
+    end
+    markov = MarkyMarkov::Dictionary.new(options[:dictionary])
+  end
+  STDOUT.puts markov.dictionary.has_key?(tuple)
 else
   unless STDIN.tty?
     markov = MarkyMarkov::TemporaryDictionary.new
