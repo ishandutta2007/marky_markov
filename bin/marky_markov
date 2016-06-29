@@ -2,7 +2,7 @@
 #A Markov Chain generator.
 
 require 'optparse'
-require 'marky_markov'
+require_relative '../lib/marky_markov'
 
 options = {}
 opt_parser = OptionParser.new do |opts|
@@ -26,6 +26,11 @@ opt_parser = OptionParser.new do |opts|
     if options[:sentencecount] < 1
       abort("You must enter a number higher than 0. Try 4. Or maybe 10?")
     end
+  end
+
+  options[:prompt] = nil
+  opts.on('-p', '--prompt STRING', 'Generate sentences starting with prompt') do |prompt|
+    options[:prompt] = prompt.split(/\W+/)
   end
 
   options[:source] = nil
@@ -71,7 +76,7 @@ when "speak"
     end
     markov = MarkyMarkov::Dictionary.new(options[:dictionary])
   end
-  STDOUT.puts markov.generate_n_sentences(options[:sentencecount])
+  STDOUT.puts markov.generate_n_sentences(options[:sentencecount], that_start_with: options[:prompt])
 when "read"
   source = ARGV[1] || options[:source]
   markov = MarkyMarkov::Dictionary.new(options[:dictionary])
